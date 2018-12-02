@@ -1,0 +1,9 @@
+html {
+  overflow: auto !important;
+}
+.bgright {
+  background-image: url('imgs/bg.jpg');
+  background-position: 70% 0%;; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+}

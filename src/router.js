@@ -1,25 +1,80 @@
+
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
+import store from './store'
+import firebase from 'firebase'
+
+import lost from './views/440.vue'
+import Login from './views/Login.vue'
+import Dash from './views/Dash.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
+      path: '/auth',
+      name: 'login',
+      component: Login,
+      meta: {
+        requrestGuest: true
+      }
+    }, {
+      path: '*',
+      component: lost
+    }, {
       path: '/',
-      name: 'home',
-      component: Home
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+      component: Dash,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  // const currentUser = localStorage.getItem('accountDetails').currentUser;
+  const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const accountDetails = localStorage.getItem('accountDetails')
+  // const accountDetails = store.getters.accountDetails
+  if (requiresAuth && !accountDetails) {
+    next({
+      path: '/auth',
+      query: { redirect: to.fullPath }
+    })
+  } else if (to.path == '/auth' && accountDetails) {
+    next('/')
+  } else {
+    next() // make sure to always call next()!
+  }
+});
+
+export default router;
+
+
+// if(requiresAuth) {
+//   if(!accountDetails) {
+//     next({
+//       path: '/auth',
+//       query: {
+//         redirect: to.fullPath
+//       }
+//     })
+//     console.log(firebase.auth().currentUser)
+//   } else {
+//     next()
+//   }
+// } else if(requiresGuest) {
+//   if(accountDetails) {
+//     next({
+//       path: '/',
+//       query: {
+//         redirect: to.fullPath
+//       }
+//     })
+//   } else {
+//     next()
+//   }
