@@ -4,7 +4,7 @@ import Router from 'vue-router'
 import store from './store'
 import firebase from 'firebase'
 
-import lost from './views/440.vue'
+import lost from './views/404.vue'
 import Login from './views/Login.vue'
 import Dash from './views/Dash.vue'
 
