@@ -6,14 +6,29 @@ import store from './store'
 
 import firebase from 'firebase'
 const config = {
-  apiKey: "AIzaSyDx5FJmdWWj_Fi-2DXYnpkhQST83_9ugtc",
-  authDomain: "inventory-system-9a2c4.firebaseapp.com",
-  databaseURL: "https://inventory-system-9a2c4.firebaseio.com",
-  projectId: "inventory-system-9a2c4",
-  storageBucket: "inventory-system-9a2c4.appspot.com",
-  messagingSenderId: "669915201568"
-};
+  apiKey: "AIzaSyCF5-uRTXz-ri-tsdTLS8t9G-4sE9P_uw8",
+  authDomain: "alumnisystem-1a0cf.firebaseapp.com",
+  databaseURL: "https://alumnisystem-1a0cf.firebaseio.com",
+  projectId: "alumnisystem-1a0cf",
+  storageBucket: "alumnisystem-1a0cf.appspot.com",
+  messagingSenderId: "242517042814"
+}
 firebase.initializeApp(config);
+
+// Load the full build.
+var _ = require('lodash');
+// Load the core build.
+var _ = require('lodash/core');
+// Load the FP build for immutable auto-curried iteratee-first data-last methods.
+var fp = require('lodash/fp');
+ 
+// Load method categories.
+var array = require('lodash/array');
+var object = require('lodash/fp/object');
+ 
+// Cherry-pick methods for smaller browserify/rollup/webpack bundles.
+var at = require('lodash/at');
+var curryN = require('lodash/fp/curryN');
 
 Vue.config.productionTip = false
 

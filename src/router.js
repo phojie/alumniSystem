@@ -8,6 +8,11 @@ import lost from './views/404.vue'
 import Login from './views/Login.vue'
 import Dash from './views/Dash.vue'
 
+import Admin from './views/admin.vue'
+import Events from './components/Admin/events.vue'
+
+
+
 Vue.use(Router)
 
 const router = new Router({
@@ -26,10 +31,16 @@ const router = new Router({
       component: lost
     }, {
       path: '/',
-      component: Dash,
+      component: Admin,
       meta: {
         requiresAuth: true
-      }
+      },
+      children: [
+        {
+          path: '/Events',
+          component: Events,
+        }
+      ]
     }
   ]
 })
@@ -48,6 +59,15 @@ router.beforeEach((to, from, next) => {
   } else if (to.path == '/auth' && accountDetails) {
     next('/')
   } else {
+    // var objAccount = JSON.parse(accountDetails);
+    // if(objAccount.type == 1) {
+    //   //admin
+    //   console.log("I am admin")
+    //   next('/')
+    // } else {
+    //   //user
+    //   next('/')
+    // }
     next() // make sure to always call next()!
   }
 });

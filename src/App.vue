@@ -19,5 +19,9 @@
       return {
       }
     },
+    created() {
+      this.$store.dispatch(getEvents)
+      console.log(this.$store.getters.listofEvents)
+    }
   }
 </script>

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i');
+
 html {
   overflow: auto !important;
 }
@@ -6,4 +8,66 @@ html {
   background-position: 70% 0%;; /* Center the image */
   background-repeat: no-repeat; /* Do not repeat the image */
   background-size: cover; /* Resize the background image to cover the entire container */
+}
+
+
+/* 
+Website theme
+*/
+
+.wprimary {
+  color: maroon;
+  background-color: maroon !important;
+}
+
+.titleFont {
+  font-family: 'Noto Serif', serif;
+}
+
+.jieWhatBg {
+  background-image: url(https://ssl.gstatic.com/support/content/images/static/homepage_header_background.svg);
+  /* background-position: 50% 10px; */
+  background-position: center;
+  /* background-size: cover; */
+  background-repeat: no-repeat;
+  /* height: 105px; */
+}
+
+.alumniP {
+  background-image: url('/imgs/alumni.png');
+  /* background-position: 50% 10px; */
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* height: 105px; */
+}
+
+.textLower {
+  text-transform: lowercase !important; 
+}
+.textUpper {
+  text-transform: uppercase !important; 
+}
+.textNone {
+  text-transform: none !important; 
+}
+.textCapital {
+  text-transform: capitalize !important; 
+}
+
+.themeColor1 {
+  background-color: #7a170517;
+  border-color: #7a170517;
+}
+
+.themeColor2 { 
+  background-color: #990000 !important;
+  border-color: #990000 !important;
+}
+
+.themeColor1Text {
+  color: #7a170517 !important;
+}
+.themeColor2Text {
+  color: #990000 !important;
 }
