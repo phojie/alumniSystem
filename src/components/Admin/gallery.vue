@@ -4,9 +4,9 @@
     <v-flex xs12>
       <v-card width="100%" class="px-4 py-2" >
         <v-layout align-center row wrap>
-          <h6 class="title"> Gallery </h6>
+          <h6 class="px-2 py-3 title"> Gallery </h6>
         <v-spacer></v-spacer>
-        <v-btn @click="newAlbum" class=" textNone" color="red darken-3" flat dark>Add album</v-btn>
+        <v-btn @click="newAlbum" v-if="admin" class="ma-0 pa-0 textNone" color="red darken-3" flat dark>Add album</v-btn>
         </v-layout>
       </v-card>
     </v-flex>
@@ -28,6 +28,7 @@
             mdi-view-grid
           </v-icon>
           <v-icon
+          v-if="admin"
             small
             class="mr-2"
             @click="editItem(props.item)"
@@ -35,6 +36,7 @@
             edit
           </v-icon>
           <v-icon
+          v-if="admin"
             small
             @click="deleteItem(props.item)"
           >
@@ -333,6 +335,15 @@ export default {
     listofAlbum () {
       var data = _.filter(this.$store.getters.listofAlbum, 'keyIndex')
       return data
+    },
+    admin () {
+      var accountDetails = localStorage.getItem('accountDetails')
+      var data = JSON.parse(accountDetails);
+      if(data.type == 1) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {

@@ -4,9 +4,9 @@
     <v-flex xs12>
       <v-card width="100%" class="px-4 py-2" >
         <v-layout align-center row wrap>
-          <h6 class="title"> List of Announcements </h6>
+          <h6 class="px-2 py-3 title"> List of Announcements </h6>
         <v-spacer></v-spacer>
-        <v-btn @click="submitDialog" class=" textNone" color="red darken-3" flat dark>New Announcement</v-btn>
+        <v-btn @click="submitDialog" v-if="admin" class="ma-0 pa-0 textNone" color="red darken-3" flat dark>New Announcement</v-btn>
         </v-layout>
       </v-card>
     </v-flex>
@@ -30,7 +30,7 @@
                 </v-card-title>
               </v-flex>
               <v-flex xs2 class="">
-                <v-layout row wrap>
+                <v-layout  v-if="admin" row wrap>
                    <v-btn icon @click="editData(announce)">
                     <v-icon style="font-size:15px" class="grey--text">edit</v-icon>
                   </v-btn>
@@ -211,6 +211,15 @@ export default {
       var data = _.filter(data1,'title')
 			// console.log('TCL: listofAnnounce -> data', data)
       return _.reverse(data)
+    },
+    admin () {
+      var accountDetails = localStorage.getItem('accountDetails')
+      var data = JSON.parse(accountDetails);
+      if(data.type == 1) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {

@@ -16,6 +16,9 @@ import Account from './components/Admin/accounts.vue'
 import Profile from './components/Admin/profile.vue'
 import Msu from './components/Admin/msu.vue'
 
+import User from './views/user.vue'
+
+
 
 
 Vue.use(Router)
@@ -36,6 +39,56 @@ const router = new Router({
       component: lost
     }, {
       path: '/',
+      component: User,
+      meta: {
+        requiresAuth: true
+      },
+      children: [
+        {
+          path: '/Events',
+          component: Events,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/Gallery',
+          component: Gallery,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/Announcement',
+          component: Announcement,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/Accounts',
+          component: Account,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/Msu',
+          component: Msu,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/Profile',
+          component: Profile,
+          meta: {
+            requiresAuth: true
+          },
+        }
+      ]
+    }, {
+      path: '/admin',
       component: Admin,
       meta: {
         requiresAuth: true
@@ -44,75 +97,73 @@ const router = new Router({
         {
           path: '/Events',
           component: Events,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: '/Gallery',
           component: Gallery,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: '/Announcement',
           component: Announcement,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: '/Accounts',
           component: Account,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: '/Msu',
           component: Msu,
+          meta: {
+            requiresAuth: true
+          },
         },
         {
           path: '/Profile',
           component: Profile,
+          meta: {
+            requiresAuth: true
+          },
         }
       ]
-    }
+    },
+    
   ]
 })
 
 router.beforeEach((to, from, next) => {
   // const currentUser = localStorage.getItem('accountDetails').currentUser;
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //user
+  // const requires1Auth = to.matched.some(record => record.meta.requires1Auth); //admin
+
   const accountDetails = localStorage.getItem('accountDetails')
   var objAccount = JSON.parse(accountDetails);
-  if(objAccount) {
-    var type = objAccount.type
-  } else {
-    var type = 0
-  }
-  if (requiresAuth && !accountDetails) {
+  if (requiresAuth && !accountDetails  ) {
     next({
       path: '/auth',
       query: { redirect: to.fullPath }
     })
   } else if (to.path == '/auth' && accountDetails) {
-    next('/')
+    next('/Events') 
   } else {
+    // console.log(objAccount)
     next() // make sure to always call next()!
-    if(type === 1) {
-      //admin
-		// console.log('TCL: accountDetails', type , 1)
-      if(to.path == '/Events') {
-        next('/Events')
-      } else if(to.path == '/Announcement') {
-        next('/Announcement')
-      } else if(to.path == '/Gallery') {
-        next('/Gallery')
-      } else if(to.path == '/Accounts') {
-        next('/Accounts')
-      } else if(to.path == '/Msu') {
-        next('/Msu')
-      } else {
-        next({
-          path: '/Events',
-          query: { redirect: to.fullPath }
-        })
-      }
-    } 
-    else {
-      next('/')
+    if (to.path == '/' && accountDetails) {
+      next('/Events') 
     }
+    
   }
 });
 

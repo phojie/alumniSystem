@@ -484,13 +484,11 @@
       listofEvents() {
         var data1 = this.$store.getters.listofEvents
         var data = _.filter(data1,'title')
-        console.log('TCL: listofEvents -> data', data)
         return _.reverse(data)
       },
       listofAnnouncement() {
         var data1 = this.$store.getters.listofAnnouncement
         var data = _.filter(data1,'title')
-        console.log('TCL: listofAnnouncement -> data', data)
         return _.reverse(data)
       },
       listofInfo() {

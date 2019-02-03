@@ -82,7 +82,7 @@ export default {
 
           setTimeout(function(){
             firebase.database().ref('accountUser').on('value', function(snapshot) {
-            var findUser = _.find(snapshot.val(), {'username': _.capitalize(vm.accountData.username), 'password': vm.accountData.password})
+            var findUser = _.find(snapshot.val(), {'idnumber': _.capitalize(vm.accountData.username), 'password': vm.accountData.password})
             // var findEmail = _.find(snapshot.val(), {'email': _.capitalize(vm.accountData.username), 'password': vm.accountData.password})
             //  || findEmail != null
             console.log(snapshot.val())

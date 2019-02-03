@@ -25,17 +25,17 @@
               </v-flex>
               <v-flex xs2 class="">
                 <v-layout row wrap>
-                   <v-btn icon @click="editData(info)">
+                  <v-btn v-if="admin && info.title != 'Officers'" icon @click="editData(info)">
                     <v-icon style="font-size:15px" class="grey--text">edit</v-icon>
                   </v-btn>
-                  <v-btn icon @click="deleteData(info)" >
+                  <!-- <v-btn icon @click="deleteData(info)" >
                     <v-icon style="font-size:17px" class="grey--text">close</v-icon>
-                  </v-btn>
+                  </v-btn> -->
                   </v-layout>
                 </v-flex>
             </v-layout>
           <v-slide-y-transition>
-            <v-card-text v-if="info.details.email == null" >
+            <v-card-text v-if="info.title != 'Contact us'" >
               {{info.details}}
             </v-card-text>
             <span v-else>
@@ -91,25 +91,18 @@
           primary-title
         >
         {{titleDialog}}
+        <v-spacer></v-spacer>
+        <v-btn v-if="eventsData.title == 'Officers' && addOfficer == false" @click="addOfficer = true" color="success">Add officer</v-btn>
+        <v-btn v-if="eventsData.title == 'Officers' && addOfficer == true" @click="addOfficer = false" color="success">View Officer</v-btn>
         </v-card-title>
 
       <v-progress-linear v-if="submitStatus == 'Loading...'" :indeterminate="true"></v-progress-linear>
-
+  
         <v-card-text>
           <v-container grid-list-md>
             <v-layout wrap>
-              <v-flex v-if="eventsData.email == null">
-                <v-flex xs12  >
-                  <v-textarea label="Details "
-                    color="red darken-2"
-                    v-model="eventsData.details"
-                    auto-grow
-                    required>
-                  </v-textarea>
-                </v-flex>
-              </v-flex>
-              <v-flex v-else>
-                <v-flex xs12  >
+              <v-flex v-if="eventsData.title == 'Contact us'">
+                 <v-flex xs12  >
                   <v-textarea label="Details "
                     color="red darken-2"
                     v-model="eventsData.details.details"
@@ -134,6 +127,18 @@
                     color="red darken-2"
                     v-model="eventsData.details.location"
                     required></v-text-field>
+                </v-flex>
+                
+              </v-flex>
+             
+              <v-flex v-else>
+               <v-flex xs12  >
+                  <v-textarea label="Details "
+                    color="red darken-2"
+                    v-model="eventsData.details"
+                    auto-grow
+                    required>
+                  </v-textarea>
                 </v-flex>
               </v-flex>
               <v-flex xs12 >
@@ -164,9 +169,17 @@
           >
             Save
           </v-btn>
-
+          
           <v-btn
-            v-else
+            v-else-if="eventsData.title == 'Officers' && addOfficer == true"
+            color="success"
+            flat
+            @click="submitOfficer"
+          >
+            Save
+          </v-btn>
+          <v-btn
+            v-if="eventsData.title != 'Officers'"
             color="success"
             flat
             @click="submitEdit"
@@ -230,6 +243,10 @@ export default {
       title: {required},
       details: {required},
     },
+    officerData: {
+      title: {required},
+      role: {required},
+    }
   },
   data() {
     return {
@@ -254,6 +271,26 @@ export default {
       snackbar2: false,
       snackbar3: false,
       titleDialog: '',
+
+      addOfficer: false,
+      officerData: {
+        title: '',
+        keyIndex: '',
+        backgroundPic: '',
+        role: '',
+      },
+
+      headers: [
+        {
+          text: 'profile',
+          align: 'left',
+          sortable: false,
+          value: 'backgroundPic'
+        },
+        { text: 'Title', value: 'Title' },
+        { text: 'Role', value: 'Role' },
+        { text: 'Action', value: 'Role' },
+      ]
     }
   },
   computed: {
@@ -264,9 +301,83 @@ export default {
       var data1 = this.$store.getters.listofInfo
       var data = _.filter(data1,'title')
       return data
+    },
+    admin () {
+      var accountDetails = localStorage.getItem('accountDetails')
+      var data = JSON.parse(accountDetails);
+      if(data.type == 1) {
+        return true
+      } else {
+        return false
+      }
+    },
+    listofOfficer() {
+      var data1 = this.listofInfo
+      var data = _.find(data1,['title','Officers']) // all data in officer
+      return data2
     }
   },
   methods: {
+    submitOfficer() {
+      this.$v.$touch()
+      if (this.$v.officerData.$invalid) {
+        this.submitStatus = 'All field is required*'
+      } else {
+        // do your submit logic here
+        this.submitStatus = 'Loading...'
+        setTimeout(() => {
+          this.officerNow()
+        }, 500)
+      }
+    },
+    officerNow() {
+       let vm = this
+      var newPostKey = firebase.database().ref().child('schoolInfo/WLYXzXuOHc').push().key;
+      var storageRef = firebase.storage().ref();
+
+      if(vm.image != '') {
+          var uploadTask = storageRef.child(`schoolInfo/` + newPostKey).putString(vm.image, 'data_url')
+          uploadTask.on('state_changed', function(snapshot){
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          }, function(error) {
+          }, function () {
+            uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+              vm.eventsData.backgroundPic = downloadURL
+              var adddata = firebase.database().ref().child('schoolInfo/WLYXzXuOHc/'+newPostKey)
+              adddata.set({
+                backgroundPic: vm.eventsData.backgroundPic,
+                title: _.capitalize(vm.officerData.title),
+                keyIndex: newPostKey,
+                role:  _.capitalize(vm.officerData.role),
+              })
+              vm.eventsData={
+                title: '',
+                keyIndex: '', 
+                role: '',
+              }
+              vm.image = ''
+              vm.dialog=false
+              vm.submitStatus= ''
+            })
+          })
+      } else {
+        var adddata = firebase.database().ref().child('schoolInfo/WLYXzXuOHc/'+newPostKey)
+        adddata.set({
+          backgroundPic: vm.eventsData.backgroundPic,
+          title: _.capitalize(vm.officerData.title),
+          keyIndex: newPostKey,
+          role:  _.capitalize(vm.officerData.role),
+        })
+        vm.eventsData={
+          title: '',
+          keyIndex: '', 
+          role: '',
+        }
+        vm.image = ''
+        vm.dialog=false
+        vm.submitStatus= ''
+      }
+    },
     editData(data) {
       this.eventsData= {
         title: data.title,

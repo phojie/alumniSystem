@@ -4,9 +4,9 @@
     <v-flex xs12>
       <v-card width="100%" class="px-4 py-2" >
         <v-layout align-center row wrap>
-          <h6 class="title"> List of Events </h6>
+          <h6 class="px2 py-3 title"> List of Events </h6>
         <v-spacer></v-spacer>
-        <v-btn @click="submitDialog" class=" textNone" color="red darken-3" flat dark>New Event</v-btn>
+        <v-btn @click="submitDialog" v-if="admin" class="pa-0 ma-0 textNone" color="red darken-3" flat dark>New Event</v-btn>
         </v-layout>
       </v-card>
     </v-flex>
@@ -42,10 +42,10 @@
               <span class="grey--text">{{event.dateInfo}}</span>
             </div>
             <v-spacer></v-spacer>
-            <v-btn icon @click="editData(event)">
+            <v-btn v-if="admin" icon @click="editData(event)">
               <v-icon style="font-size:15px" class="grey--text">edit</v-icon>
             </v-btn>
-            <v-btn icon @click="deleteData(event)" >
+            <v-btn v-if="admin" icon @click="deleteData(event)" >
               <v-icon style="font-size:17px" class="grey--text">close</v-icon>
             </v-btn>
  
@@ -266,8 +266,16 @@ export default {
     listofEvents () {
       var data1 = this.$store.getters.listofEvents
       var data = _.filter(data1,'title')
-			console.log('TCL: listofEvents -> data', data)
       return _.reverse(data)
+    },
+    admin () {
+      var accountDetails = localStorage.getItem('accountDetails')
+      var data = JSON.parse(accountDetails);
+      if(data.type == 1) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {
@@ -302,7 +310,7 @@ export default {
       var newPostKey = vm.eventsData.keyIndex
       var storageRef = firebase.storage().ref();
 
-      if(vm.image != '') {
+      if(vm.image !=  this.eventsData.backgroundPic) {
           var uploadTask = storageRef.child(`eventsImages/` + newPostKey).putString(vm.image, 'data_url')
           uploadTask.on('state_changed', function(snapshot){
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;

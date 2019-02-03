@@ -1,5 +1,5 @@
 <template>
-  <v-container grid-list-lg>
+  <v-container  grid-list-lg>
     <v-layout row wrap >
     <v-flex xs12>
       <v-card width="100%" class="px-4 py-2" >
@@ -15,7 +15,7 @@
           flat
           solo=""
         ></v-text-field>
-        <v-btn @click="newAccount" class=" textNone" color="red darken-3" flat dark>New Account</v-btn>
+        <v-btn v-if="admin" @click="newAccount" class=" textNone" color="red darken-3" flat dark>New Account</v-btn>
         </v-layout>
       </v-card>
     </v-flex>
@@ -39,21 +39,23 @@
           <td class="">{{ props.item.yeargrad }}</td>
           <td class="">{{ props.item.college }}</td>
           <td class=" ">
-            <!-- <v-icon
+            <v-icon
               small
               class="mr-2"
               @click="viewItem(props.item)"
             >
               mdi-view-grid
-            </v-icon> -->
+            </v-icon>
             <v-icon
               small
+              v-if="admin"
               class="mr-2"
               @click="editData(props.item)"
             >
               edit
             </v-icon>
             <v-icon
+              v-if="admin"
               small
               @click="deleteItem(props.item)"
             >
@@ -71,10 +73,110 @@
   
 
     <!-- dialog -->
+    <v-dialog v-model="dialog5"  max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline red--text text--darken-4">{{eventsData.firstname+ ' ' +eventsData.middlename+ ' ' +eventsData.lastname}} </span> <span class="headline">&nbsp; Profile</span>
+        </v-card-title>
+       
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap>
+              <v-flex xs12 class="mb-3">
+                <v-layout justify-center row wrap>
+                <v-avatar
+                    size="120"
+                    color="themeColor1"
+                  >
+                    <img :src="eventsData.backgroundPic" alt="alt">
+                  </v-avatar>
+                </v-layout>
+              </v-flex>
+          
+
+              <v-flex xs12>
+              <v-text-field
+                label="Batch"
+                readonly=""
+                v-model="eventsData.yeargrad"
+              ></v-text-field>
+              <v-text-field
+                label="Address"
+                readonly=""
+                v-model="eventsData.address"
+              ></v-text-field>
+              <v-text-field
+                readonly=""
+                label="City"
+                v-model="eventsData.city"
+              ></v-text-field>
+              <v-text-field
+                readonly=""
+                label="Province"
+                v-model="eventsData.province"
+              ></v-text-field>
+              <v-text-field
+                readonly=""
+                label="Contact No"
+                v-model="eventsData.contactno"
+              ></v-text-field>
+              <v-text-field
+                readonly=""
+                label="Email"
+                v-model="eventsData.email"
+              ></v-text-field>
+
+              <v-divider></v-divider>
+
+              <v-radio-group 
+                readonly=""
+                v-model="eventsData.selfemployed" :mandatory="false">
+                <label for="" class="mb-1 grey--text">Self employed</label>
+                <v-radio label="Yes" value="Yes"></v-radio><v-radio label="No" value="No"></v-radio>
+              </v-radio-group>
+              <v-text-field
+                readonly=""
+                label="Company Name"
+                v-model="eventsData.companyname"
+              ></v-text-field>
+              <v-text-field
+                readonly=""
+                label="Company Address"
+                v-model="eventsData.companyaddress"
+              ></v-text-field>
+              <v-text-field
+                readonly=""
+                label="Company No"
+                v-model="eventsData.companyno"
+              ></v-text-field>
+              <v-text-field
+                label="Position"
+                readonly=""
+                v-model="eventsData.position"
+              ></v-text-field>
+              <v-text-field
+                label="Department"
+                readonly=""
+                v-model="eventsData.department"
+              ></v-text-field>
+              </v-flex>
+             
+
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click="dialog5 = false">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+
     <v-dialog
       v-model="dialog"
       width="600"
-    >
+     >
       <v-card
         class="mx-auto"
         max-width="600"
@@ -477,6 +579,7 @@ export default {
       snackbar3: false,
       dialog3: false,
       dialog4: false,
+      dialog5: false,
       headers: [
       {
         text: 'Profile',
@@ -514,9 +617,45 @@ export default {
       var data1 = this.$store.getters.listofAccount
       var data = _.filter(data1,'yeargrad')
       return _.reverse(data)
+    },
+    admin () {
+      var accountDetails = localStorage.getItem('accountDetails')
+      var data = JSON.parse(accountDetails);
+      if(data.type == 1) {
+        return true
+      } else {
+        return false
+      }
     }
   },
   methods: {
+    viewItem(data) {
+      this.eventsData= {
+        keyIndex: data.keyIndex,
+        backgroundPic: data.backgroundPic,
+        idnumber: data.idnumber,
+        firstname: data.firstname,
+        middlename: data.middlename,
+        lastname: data.lastname,
+        college: data.college,
+        yeargrad: data.yeargrad,
+        password: data.password,
+
+        address: data.address,
+        city: data.city,
+        province: data.province,
+        contactno: data.contactno,
+        email: data.email,
+        selfemployed: data.selfemployed,
+        companyname: data.companyname,
+        companyaddress: data.companyaddress,
+        companyno: data.companyno,
+        position : data.position,
+        department: data.department,
+      }
+
+      this.dialog5 = true
+    },
     submitEdit() {
       var validID = _.filter(this.$store.getters.listofAccount, ['idnumber',_.capitalize(this.eventsData.idnumber)])
       if(this.step2 === 1) {
@@ -547,8 +686,6 @@ export default {
           this.submitStatus = 'Password and confirmation password does not match'
         } else {
           // do your submit logic here
-          this.eventsData.password = ''
-          this.eventsData.cpassword = ''
           this.submitStatus = 'Loading...'
           setTimeout(() => {
             this.step2++
@@ -711,8 +848,6 @@ export default {
           this.submitStatus = 'Password and confirmation password does not match'
         } else {
           // do your submit logic here
-          this.eventsData.password = ''
-          this.eventsData.cpassword = ''
           this.submitStatus = 'Loading...'
           setTimeout(() => {
             this.step++
@@ -752,7 +887,7 @@ export default {
     },
     saveNew() {
       let vm = this
-      var newPostKey = firebase.database().ref().child('accountUser').push().key;
+      var newPostKey = firebase.database().ref().child('accountUser/').push().key;
       var storageRef = firebase.storage().ref();
   
         var adddata = firebase.database().ref().child('accountUser/'+newPostKey)

@@ -147,16 +147,16 @@
               slot="activator" icon large>
               <v-avatar size="40px" class="pa-3 red lighten-2" >
                 <img
-                  :src="accountDetails.profile"
+                  :src="accountDetails.backgroundPic"
                   alt="Profile"
                 >
               </v-avatar>
               </v-btn>
               <v-list dense>
-                <v-list-tile>
+                <!-- <v-list-tile>
                   <v-list-tile-title style="font-size:12px"> <v-icon small color="red darken-3">mdi-account-edit </v-icon> Account</v-list-tile-title>
-                </v-list-tile>
-                <v-list-tile>
+                </v-list-tile> -->
+                <v-list-tile @click="dialog5 = true">
                   <v-list-tile-title style="font-size:12px"><v-icon small color="red darken-3">mdi-account-key </v-icon> Change pass</v-list-tile-title>
                 </v-list-tile>
                 <v-list-tile @click="logoutAccount">
@@ -180,13 +180,15 @@ import firebase from 'firebase'
 export default {
   data: () => ({
     drawer: true,
+    dialog: true
   }),
   computed: {
     accountDetails() {
       var obUser = JSON.parse(localStorage.getItem('accountDetails') );
 			// console.log('​accountDetails -> obUser', obUser)
       return obUser
-    }
+    },
+    
   },
   methods: {
     logoutAccount() {
