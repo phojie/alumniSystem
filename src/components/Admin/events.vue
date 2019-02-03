@@ -6,39 +6,53 @@
         <v-layout align-center row wrap>
           <h6 class="title"> List of Events </h6>
         <v-spacer></v-spacer>
-        <v-btn @click="dialog = true" class=" textNone" color="red darken-3" flat dark>New Event</v-btn>
+        <v-btn @click="submitDialog" class=" textNone" color="red darken-3" flat dark>New Event</v-btn>
         </v-layout>
       </v-card>
     </v-flex>
-    <v-flex xs12 >
-      <v-card>
+    <v-flex v-if="listofEvents.length == 0">
+      <v-layout class=" subheading mt-5" justify-center="" row wrap>
+        No event found
+      </v-layout>
+    </v-flex>
+   
+    <v-flex class="mb-2" xs12 v-for="event in listofEvents" :key="event.id" >
+      <v-card >
         <v-layout row wrap>
           <v-flex xs12 md3 class="px-1" >
           <v-img
+            v-if="event.backgroundPic != ''"
             style="border-radius:3px"
-            src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-            height="200px"
+            :src="event.backgroundPic"
+            height="100px"
+          >
+          </v-img>
+          <v-img
+            v-else  
+            style="border-radius:3px"
+            src="https://cdn.pixabay.com/photo/2016/10/16/21/13/workshop-1746275_960_720.jpg"
+            height="100px"
           >
           </v-img>
           </v-flex>
           <v-flex xs12 md9>
           <v-card-title primary-title>
             <div>
-              <div class="headline red--text text--darken-4">Top western road trips</div>
-              <span class="grey--text">1,000 miles of wonder</span>
+              <div class="headline red--text text--darken-4">{{event.title}}</div>
+              <span class="grey--text">{{event.dateInfo}}</span>
             </div>
             <v-spacer></v-spacer>
-            <v-btn icon >
-              <v-icon>edit</v-icon>
+            <v-btn icon @click="editData(event)">
+              <v-icon style="font-size:15px" class="grey--text">edit</v-icon>
             </v-btn>
-            <v-btn icon >
-              <v-icon>close</v-icon>
+            <v-btn icon @click="deleteData(event)" >
+              <v-icon style="font-size:17px" class="grey--text">close</v-icon>
             </v-btn>
  
           </v-card-title>
           <v-slide-y-transition>
             <v-card-text >
-              I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
+              {{event.details}}
             </v-card-text>
           </v-slide-y-transition>
           </v-flex>
@@ -52,6 +66,7 @@
     <v-dialog
       v-model="dialog"
       width="600"
+      persistent=""
     >
 
       <v-card>
@@ -59,9 +74,9 @@
           class="headline grey lighten-2"
           primary-title
         >
-          New Event
+          {{titleDialog}}
         </v-card-title>
-
+      <v-progress-linear v-if="submitStatus == 'Loading...'" :indeterminate="true"></v-progress-linear>
          <v-card-text>
           <v-container grid-list-md>
             <v-layout wrap>
@@ -97,6 +112,19 @@
                   required>
                 </v-textarea>
               </v-flex>
+              
+              <v-flex xs12 >
+                <v-card
+                  v-show="submitStatus != ''"
+                  flat
+                >
+                <span v-if="submitStatus == 'All field is required*'" class="red--text subheading">{{submitStatus}}</span> 
+                <span v-else-if="submitStatus == 'Loading...'" class="amber--text subheading">{{submitStatus}}</span> 
+                <span v-else class="green--text subheading">{{submitStatus}}</span> 
+
+                </v-card>
+              </v-flex>
+             
 
               <!-- <v-flex xs12 lg6>
                 <v-menu
@@ -128,24 +156,88 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
+           <v-btn
             color="primary"
             flat
-            @click="saveNew"
+            @click="dialog = false"
+          >
+            Close
+          </v-btn>
+          <v-btn
+            v-if="titleDialog == 'New Event'"
+            color="success"
+            flat
+            @click="submit"
           >
             Save
           </v-btn>
+
+          <v-btn
+            v-else
+            color="success"
+            flat
+            @click="submitEdit"
+          >
+            Update
+          </v-btn>
+
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-snackbar
+      v-model="snackbar"
+    >
+      Successfully Added Event
+      <v-btn
+        color="pink"
+        flat
+        @click="snackbar = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar
+      v-model="snackbar2"
+    >
+      Successfully Deleted Event
+      <v-btn
+        color="pink"
+        flat
+        @click="snackbar2 = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar
+      v-model="snackbar3"
+    >
+      Successfully Updated Event
+      <v-btn
+        color="pink"
+        flat
+        @click="snackbar3 = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
 <script>
 import moment from 'moment'
 import firebase from 'firebase';
-
+import { validationMixin } from 'vuelidate'
+import { required } from 'vuelidate/lib/validators'
 export default {
+  mixins: [validationMixin],
+  validations: { 
+    eventsData: {
+      title: {required},
+      dateInfo: {required},
+      details: {required},
+    },
+  },
   data() {
     return {
       date: new Date().toISOString().substr(0, 10),
@@ -160,14 +252,132 @@ export default {
         keyIndex: '', 
         details: '',
       },
+      submitStatus: null,
+      snackbar: false,
+      snackbar2: false,
+      snackbar3: false,
+      titleDialog: ''
     }
   },
   computed: {
     computedDateFormattedMomentjs () {
       return this.date ? moment(this.date).format('dddd, MMMM Do YYYY') : ''
     },
+    listofEvents () {
+      var data1 = this.$store.getters.listofEvents
+      var data = _.filter(data1,'title')
+			console.log('TCL: listofEvents -> data', data)
+      return _.reverse(data)
+    }
   },
   methods: {
+    editData(data) {
+      this.eventsData= {
+        backgroundPic: data.backgroundPic,
+        title: data.title,
+        dateInfo: data.dateInfo,
+        keyIndex: data.keyIndex, 
+        details: data.details,
+      }
+      this.image = data.backgroundPic
+      this.dialog = true
+      this.titleDialog = 'Edit Event'
+    },
+    submitEdit() {
+      this.$v.$touch()
+      if (this.$v.$invalid) {
+        this.submitStatus = 'All field is required*'
+      } else {
+        // do your submit logic here
+        this.submitStatus = 'Loading...'
+        setTimeout(() => {
+          this.editEvent()
+          this.snackbar3= true
+          this.submitStatus = null
+        }, 500)
+      }
+    },
+    editEvent() {
+      let vm = this
+      var newPostKey = vm.eventsData.keyIndex
+      var storageRef = firebase.storage().ref();
+
+      if(vm.image != '') {
+          var uploadTask = storageRef.child(`eventsImages/` + newPostKey).putString(vm.image, 'data_url')
+          uploadTask.on('state_changed', function(snapshot){
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            
+          }, function(error) {
+          }, function () {
+            uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+              vm.eventsData.backgroundPic = downloadURL
+              var adddata = firebase.database().ref().child('Events/'+newPostKey)
+              adddata.update({
+                backgroundPic: vm.eventsData.backgroundPic,
+                title: _.capitalize(vm.eventsData.title),
+                dateInfo:  _.capitalize(vm.eventsData.dateInfo),
+                keyIndex: newPostKey,
+                details:  _.capitalize(vm.eventsData.details),
+              })
+              vm.eventsData={
+                title: '',
+                dateInfo: '',
+                keyIndex: '', 
+                details: '',
+              }
+              vm.image = ''
+              vm.dialog=false
+            })
+          })
+      } else {
+        var adddata = firebase.database().ref().child('Events/'+newPostKey)
+        adddata.update({
+          backgroundPic: vm.image,
+           title: _.capitalize(vm.eventsData.title),
+          dateInfo:  _.capitalize(vm.eventsData.dateInfo),
+          keyIndex: newPostKey,
+          details:  _.capitalize(vm.eventsData.details),
+        })
+        vm.eventsData={
+          title: '',
+          dateInfo: '',
+          keyIndex: '', 
+          details: '',
+        }
+        vm.image = ''
+        vm.dialog=false
+      }
+    },
+    submitDialog() {
+      this.eventsData= {
+        backgroundPic:'',
+        title: '',
+        dateInfo: '',
+        keyIndex: '', 
+        details: '',
+      },
+      this.titleDialog = 'New Event'
+      this.dialog = true
+    },
+    submit() {
+      this.$v.$touch()
+      if (this.$v.$invalid) {
+        this.submitStatus = 'All field is required*'
+      } else {
+        // do your submit logic here
+        this.submitStatus = 'Loading...'
+        setTimeout(() => {
+          this.saveNew()
+          this.snackbar= true
+          this.submitStatus = null
+        }, 500)
+      }
+    },
+    deleteData(data) {
+      let vm = this
+      firebase.database().ref().child('Events/'+data.keyIndex).remove()
+      this.snackbar2 = true
+    },
     saveNew() {
       let vm = this
       var newPostKey = firebase.database().ref().child('accountUser').push().key;
@@ -185,10 +395,10 @@ export default {
               var adddata = firebase.database().ref().child('Events/'+newPostKey)
               adddata.set({
                 backgroundPic: vm.eventsData.backgroundPic,
-                title: vm.eventsData.title,
-                dateInfo: vm.eventsData.dateInfo,
+                title: _.capitalize(vm.eventsData.title),
+                dateInfo:  _.capitalize(vm.eventsData.dateInfo),
                 keyIndex: newPostKey,
-                details: vm.eventsData.details,
+                details:  _.capitalize(vm.eventsData.details),
               })
               vm.eventsData={
                 title: '',
@@ -204,10 +414,10 @@ export default {
         var adddata = firebase.database().ref().child('Events/'+newPostKey)
         adddata.set({
           backgroundPic: vm.image,
-          title: vm.eventsData.title,
-          dateInfo: vm.eventsData.dateInfo,
+           title: _.capitalize(vm.eventsData.title),
+          dateInfo:  _.capitalize(vm.eventsData.dateInfo),
           keyIndex: newPostKey,
-          details: vm.eventsData.details,
+          details:  _.capitalize(vm.eventsData.details),
         })
         vm.eventsData={
           title: '',

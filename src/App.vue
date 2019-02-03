@@ -20,8 +20,12 @@
       }
     },
     created() {
-      this.$store.dispatch(getEvents)
-      console.log(this.$store.getters.listofEvents)
+      this.$store.dispatch("getEvents")
+      this.$store.dispatch("getAlbum")
+      this.$store.dispatch("getAnnounce")
+      this.$store.dispatch("getInfo")
+      this.$store.dispatch("getAccount")
+      // console.log(this.$store.getters.listofEvents)
     }
   }
 </script>

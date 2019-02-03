@@ -10,6 +10,11 @@ import Dash from './views/Dash.vue'
 
 import Admin from './views/admin.vue'
 import Events from './components/Admin/events.vue'
+import Gallery from './components/Admin/gallery.vue'
+import Announcement from './components/Admin/announcement.vue'
+import Account from './components/Admin/accounts.vue'
+import Profile from './components/Admin/profile.vue'
+import Msu from './components/Admin/msu.vue'
 
 
 
@@ -39,6 +44,26 @@ const router = new Router({
         {
           path: '/Events',
           component: Events,
+        },
+        {
+          path: '/Gallery',
+          component: Gallery,
+        },
+        {
+          path: '/Announcement',
+          component: Announcement,
+        },
+        {
+          path: '/Accounts',
+          component: Account,
+        },
+        {
+          path: '/Msu',
+          component: Msu,
+        },
+        {
+          path: '/Profile',
+          component: Profile,
         }
       ]
     }
@@ -50,7 +75,12 @@ router.beforeEach((to, from, next) => {
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const accountDetails = localStorage.getItem('accountDetails')
-  // const accountDetails = store.getters.accountDetails
+  var objAccount = JSON.parse(accountDetails);
+  if(objAccount) {
+    var type = objAccount.type
+  } else {
+    var type = 0
+  }
   if (requiresAuth && !accountDetails) {
     next({
       path: '/auth',
@@ -59,16 +89,30 @@ router.beforeEach((to, from, next) => {
   } else if (to.path == '/auth' && accountDetails) {
     next('/')
   } else {
-    // var objAccount = JSON.parse(accountDetails);
-    // if(objAccount.type == 1) {
-    //   //admin
-    //   console.log("I am admin")
-    //   next('/')
-    // } else {
-    //   //user
-    //   next('/')
-    // }
     next() // make sure to always call next()!
+    if(type === 1) {
+      //admin
+		// console.log('TCL: accountDetails', type , 1)
+      if(to.path == '/Events') {
+        next('/Events')
+      } else if(to.path == '/Announcement') {
+        next('/Announcement')
+      } else if(to.path == '/Gallery') {
+        next('/Gallery')
+      } else if(to.path == '/Accounts') {
+        next('/Accounts')
+      } else if(to.path == '/Msu') {
+        next('/Msu')
+      } else {
+        next({
+          path: '/Events',
+          query: { redirect: to.fullPath }
+        })
+      }
+    } 
+    else {
+      next('/')
+    }
   }
 });
 

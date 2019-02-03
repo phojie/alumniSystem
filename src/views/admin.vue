@@ -51,7 +51,7 @@
           </v-btn>
 
           
-          <v-btn class="textNone caption transparent" exact-active-class="green"  depressed block to="/Appointments">
+          <v-btn class="textNone caption transparent" exact-active-class="green"  depressed block to="/Gallery">
           <v-list-tile-action>
             <v-avatar tile size="23">
               <img src="https://img.icons8.com/ios/50/ffffff/medium-icons-filled.png">
@@ -64,7 +64,7 @@
           </v-list-tile-content>
           </v-btn>
 
-          <v-btn class="textNone caption transparent" exact-active-class="green"  depressed block to="/Request">
+          <v-btn class="textNone caption transparent" exact-active-class="green"  depressed block to="/Announcement">
           <v-list-tile-action>
             <v-avatar tile size="22">
               <img src="https://img.icons8.com/ios/50/ffffff/about-filled.png">
@@ -77,7 +77,7 @@
           </v-list-tile-content>
           </v-btn>
 
-          <v-btn class="textNone caption transparent" exact-active-class="green"  depressed block to="/Employees">
+          <v-btn class="textNone caption transparent" exact-active-class="green"  depressed block to="/Accounts">
           <v-list-tile-action>
             <v-avatar tile size="23">
               <img src="https://img.icons8.com/ios/50/ffffff/find-user-male-filled.png">
@@ -89,7 +89,7 @@
             </v-list-tile-title>
           </v-list-tile-content>
           </v-btn>
-        <v-btn  class="textNone caption transparent" exact-active-class="green"  depressed block to="/Patient">
+        <v-btn  class="textNone caption transparent" exact-active-class="green"  depressed block to="/Msu">
           <v-list-tile-action>
             <v-avatar tile size="23">
               <img src="https://img.icons8.com/ios/50/ffffff/school-filled.png">
@@ -102,7 +102,7 @@
           </v-list-tile-content>
           </v-btn>
 
-          <v-btn class="textNone caption transparent" exact-active-class="green"  depressed block to="/Rooms">
+          <!-- <v-btn class="textNone caption transparent" exact-active-class="green"  depressed block to="/Profile">
           <v-list-tile-action>
             <v-avatar tile size="23">
               <img src="https://img.icons8.com/ios/50/ffffff/data-setting-filled.png">
@@ -113,11 +113,11 @@
               Profile
             </v-list-tile-title>
           </v-list-tile-content>
-          </v-btn>
+          </v-btn> -->
 
         </v-card>
 
-        <v-list-tile @click="Theme">
+        <v-list-tile>
           <v-list-tile-action>
             <v-icon color="grey darken-1">copyright</v-icon>
           </v-list-tile-action>
@@ -180,25 +180,11 @@ import firebase from 'firebase'
 export default {
   data: () => ({
     drawer: true,
-    items: [
-      { icon: 'trending_up', text: 'Most Popular' },
-      { icon: 'subscriptions', text: 'Subscriptions' },
-      { icon: 'history', text: 'History' },
-      { icon: 'featured_play_list', text: 'Playlists' },
-      { icon: 'watch_later', text: 'Watch Later' }
-    ],
-    items2: [
-      { picture: 28, text: 'Joseph' },
-      { picture: 38, text: 'Apple' },
-      { picture: 48, text: 'Xbox Ahoy' },
-      { picture: 58, text: 'Nokia' },
-      { picture: 78, text: 'MKBHD' }
-    ]
   }),
   computed: {
     accountDetails() {
       var obUser = JSON.parse(localStorage.getItem('accountDetails') );
-			console.log('​accountDetails -> obUser', obUser)
+			// console.log('​accountDetails -> obUser', obUser)
       return obUser
     }
   },
