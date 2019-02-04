@@ -70,8 +70,9 @@
             <img 
               src="https://img.icons8.com/color/1600/000000/graduation-cap.png"
               height="200">
-            <h1 class="font-weight-black white--text mb-2 display-1 text-xs-center">ALUMNI ASSOCIATION</h1>
-            <div class="font-weight-black subheading mb-3 text-xs-center">Access Anytime Anywhere</div>
+            <h1 class="font-weight-black white--text mb-2 display-1 text-xs-center"> ASSOCIATION OF MSU LNAC ALUMNI</h1>
+            <div class="font-weight-black display-1 mb-3 text-xs-center">(AMLA)</div>
+            <div class="font-weight-black title mb-3 text-xs-center">Access Anytime Anywhere</div>
 
             <v-btn @click="dialog = true" large  class="mb-4" style="background-color:#990000" >MY ALUMNI ACCOUNT</v-btn>
             </v-layout>
@@ -145,7 +146,7 @@
               <v-flex xs12>
               </v-flex>
               <v-flex xs12 v-for="(announce, index) in listofAnnouncement" :key="index" class="mt-3">
-                <v-card class="pa-2 themeColor1" width="100%"  >
+                <v-card class="px-3 pb-3 themeColor1" width="100%"  >
                   <v-card-title class="font-weight-black" primary-title>
                     {{announce.title}}
                   </v-card-title>
@@ -279,6 +280,35 @@
       <section>
         <v-container grid-list-xl>
           <v-layout row wrap justify-center class="my-5">
+            <v-flex xs12 class="mb-5">
+              <v-layout justify-center row wrap>
+                 <v-card-title class="headline" primary-title>
+                  Meet our Officers
+                </v-card-title>
+              </v-layout>
+              <v-layout justify-center align-center=""  wrap>
+              <v-card v-for="(officer, index) in officerInfo" :key="index" class="ma-2 px-5 py-3">
+                <v-flex >
+                  <v-layout justify-center="" align-center column="" wrap>
+                    <v-avatar
+                      size="150"
+                      color="red lighten-3"
+                    >
+                      <img class="pa-1" :src="officer.backgroundPic" alt="alt">
+                    </v-avatar>
+                    <v-card-title class="fontw-weight-black subheading">
+                      {{officer.title}}
+                    </v-card-title>
+                    <div class="text-xs-center font-weight-regular body-2"> {{officer.role}}</div>
+                  </v-layout>
+                </v-flex>
+               
+              </v-card>
+              </v-layout>
+            </v-flex>
+            <v-flex xs12>
+              <v-divider></v-divider>
+            </v-flex>
             <v-flex xs12 sm4>
               <v-card class="elevation-0 transparent">
                 <v-card-title primary-title class="layout justify-center">
@@ -345,7 +375,7 @@
             <div class="white--text ml-3">
               &copy; 2019
               <v-icon class="red--text">favorite</v-icon>
-              by <a class="white--text" href="#" >Laravel</a>
+              by <a class="white--text" href="#" >Herebise,Luna,Ademat</a>
               and <a class="white--text" href="#">Computer Science Students</a>
             </div>
           </v-flex>
@@ -494,6 +524,10 @@
       listofInfo() {
         var data1 = this.$store.getters.listofInfo
         return data1
+      },
+      officerInfo() {
+        console.log(this.listofInfo)
+        return this.listofInfo['WLYXzXuOHc'].details
       },
       listofAlbum() {
         var data1 = this.$store.getters.listofAlbum

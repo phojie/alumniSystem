@@ -25,7 +25,11 @@
               </v-flex>
               <v-flex xs2 class="">
                 <v-layout row wrap>
+                  
                   <v-btn v-if="admin && info.title != 'Officers'" icon @click="editData(info)">
+                    <v-icon style="font-size:15px" class="grey--text">edit</v-icon>
+                  </v-btn>
+                  <v-btn v-if="admin && info.title == 'Officers'" icon @click="editOfficers(info)">
                     <v-icon style="font-size:15px" class="grey--text">edit</v-icon>
                   </v-btn>
                   <!-- <v-btn icon @click="deleteData(info)" >
@@ -35,11 +39,8 @@
                 </v-flex>
             </v-layout>
           <v-slide-y-transition>
-            <v-card-text v-if="info.title != 'Contact us'" >
-              {{info.details}}
-            </v-card-text>
-            <span v-else>
-              <v-card-text>
+            <v-card-text v-if="info.title == 'Contact us'" >
+               <v-card-text>
                 {{info.details.details}}
               </v-card-text>
               <v-list class="transparent">
@@ -69,7 +70,39 @@
                   </v-list-tile-content>
                 </v-list-tile>
               </v-list>
-              </span>
+            </v-card-text>
+            <v-flex v-else-if="info.title == 'Officers'" xs12>
+              <v-data-table
+                :headers="headers"
+                :items="eventsData.data"
+                class="elevation-1"
+              >
+                <template slot="items" slot-scope="props">
+                  <td><v-avatar
+                    size="30"
+                    color="themeColor1"
+                  >
+                    <img :src="props.item.backgroundPic" alt="Profile Pic">
+                  </v-avatar></td>
+                  <td>{{ props.item.title }}</td>
+                  <td>{{ props.item.role }}</td>
+                  <td><v-icon
+                    small
+                    @click="deleteOfficer(props.item)"
+                  >
+                    delete
+                  </v-icon></td>
+                </template>
+              </v-data-table>
+
+            </v-flex>
+            <span v-else >
+              <v-card-text >
+                <v-card-text>
+                  {{info.details}}
+                </v-card-text>
+              </v-card-text>
+            </span>
           </v-slide-y-transition>
           </v-flex>
         </v-layout>
@@ -130,7 +163,72 @@
                 </v-flex>
                 
               </v-flex>
-             
+              <v-flex v-else-if="eventsData.title === 'Officers'">
+                <v-flex v-if="addOfficer == false" xs12>
+                  
+                  <v-data-table
+                    :headers="headers"
+                    :items="eventsData.data"
+                    class="elevation-1"
+                  >
+                    <template slot="items" slot-scope="props">
+                      <td><v-avatar
+                        size="30"
+                        color="themeColor1"
+                      >
+                        <img :src="props.item.backgroundPic" alt="Profile Pic">
+                      </v-avatar></td>
+                      <td>{{ props.item.title }}</td>
+                      <td>{{ props.item.role }}</td>
+                      <td><v-icon
+                        small
+                        @click="deleteOfficer(props.item)"
+                      >
+                        delete
+                      </v-icon></td>
+                    </template>
+                  </v-data-table>
+
+                </v-flex>
+                <v-flex v-else xs12>
+                <v-card-text >
+                  <v-flex xs12 class="mb-4">
+                    <div v-if="!image">
+                      <h2>Profile Picture</h2>
+                      <input  accept="image/*"  type="file" @change="onFileChange">
+                    </div>
+                    <div v-else>
+                      <v-avatar  color="blue lighten-5" size="120">
+                        <img class="pa-1" :src="image" />
+                      </v-avatar>
+                      <v-btn  class="caption textNone" flat ml-2 @click="removeImage">Remove image</v-btn>
+                    </div>
+                  </v-flex>
+
+                  <v-text-field
+                    label="Title"
+                    v-model="officerData.title"
+                  ></v-text-field>
+
+                  <v-text-field
+                    label="Role"
+                    v-model="officerData.role"
+                  ></v-text-field>
+                
+                  <v-flex xs12 >
+                    <v-card
+                      v-show="submitStatus != ''"
+                      flat
+                    >
+
+                    </v-card>
+                    </v-flex>
+                  </v-card-text>
+                </v-flex>
+
+               
+
+              </v-flex>
               <v-flex v-else>
                <v-flex xs12  >
                   <v-textarea label="Details "
@@ -265,6 +363,7 @@ export default {
         details2: '',
         location: '',
         cnumber: '',
+        data: '',
       },
       submitStatus: '',
       snackbar: false,
@@ -282,7 +381,7 @@ export default {
 
       headers: [
         {
-          text: 'profile',
+          text: 'Profile',
           align: 'left',
           sortable: false,
           value: 'backgroundPic'
@@ -312,12 +411,17 @@ export default {
       }
     },
     listofOfficer() {
-      var data1 = this.listofInfo
-      var data = _.find(data1,['title','Officers']) // all data in officer
-      return data2
+      var data = this.listofInfo
+      var data1 = _.filter(data,['title','Officers'])
+			console.log('TCL: listofOfficer -> data1', data1)
+      // return data1[0].details
+
     }
   },
   methods: {
+    deleteOfficer(data) {
+      firebase.database().ref().child('schoolInfo/WLYXzXuOHc/details/'+data.keyIndex).remove();
+    },
     submitOfficer() {
       this.$v.$touch()
       if (this.$v.officerData.$invalid) {
@@ -332,7 +436,7 @@ export default {
     },
     officerNow() {
        let vm = this
-      var newPostKey = firebase.database().ref().child('schoolInfo/WLYXzXuOHc').push().key;
+      var newPostKey = firebase.database().ref().child('schoolInfo/WLYXzXuOHc/details').push().key;
       var storageRef = firebase.storage().ref();
 
       if(vm.image != '') {
@@ -343,41 +447,52 @@ export default {
           }, function () {
             uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
               vm.eventsData.backgroundPic = downloadURL
-              var adddata = firebase.database().ref().child('schoolInfo/WLYXzXuOHc/'+newPostKey)
+              var adddata = firebase.database().ref().child('schoolInfo/WLYXzXuOHc/details/'+newPostKey)
               adddata.set({
                 backgroundPic: vm.eventsData.backgroundPic,
                 title: _.capitalize(vm.officerData.title),
                 keyIndex: newPostKey,
                 role:  _.capitalize(vm.officerData.role),
               })
-              vm.eventsData={
+              vm.officerData={
                 title: '',
                 keyIndex: '', 
                 role: '',
               }
               vm.image = ''
-              vm.dialog=false
+              vm.addOfficer=false
               vm.submitStatus= ''
             })
           })
       } else {
-        var adddata = firebase.database().ref().child('schoolInfo/WLYXzXuOHc/'+newPostKey)
+        var adddata = firebase.database().ref().child('schoolInfo/WLYXzXuOHc/details/'+newPostKey)
         adddata.set({
           backgroundPic: vm.eventsData.backgroundPic,
           title: _.capitalize(vm.officerData.title),
           keyIndex: newPostKey,
           role:  _.capitalize(vm.officerData.role),
         })
-        vm.eventsData={
+        vm.officerData={
           title: '',
           keyIndex: '', 
           role: '',
         }
         vm.image = ''
-        vm.dialog=false
+        vm.addOfficer= false
         vm.submitStatus= ''
       }
     },
+    editOfficers(data) {
+        var filter = _.filter(data.details,'title')
+        this.eventsData= {
+          title: data.title,
+          keyIndex: data.keyIndex, 
+          data: filter
+        }
+        console.log(data.details)
+        this.dialog = true
+        this.titleDialog = data.title
+      },
     editData(data) {
       this.eventsData= {
         title: data.title,
@@ -393,7 +508,7 @@ export default {
     },
     submitEdit() {
       this.$v.$touch()
-      if (this.$v.$invalid) {
+      if (this.$v.eventsData.$invalid) {
         this.submitStatus = 'All field is required*'
       } else {
         // do your submit logic here
@@ -503,7 +618,8 @@ export default {
     removeImage: function (e) {
       this.image = ''
     },
-  }
+  },
+
 }
 </script>
 
