@@ -6,9 +6,8 @@ import firebase from 'firebase'
 
 import lost from './views/404.vue'
 import Login from './views/Login.vue'
-import Dash from './views/Dash.vue'
-
-import Admin from './views/admin.vue'
+// import Dash from './views/Dash.vue'
+// import Admin from './views/admin.vue'
 import Events from './components/Admin/events.vue'
 import Gallery from './components/Admin/gallery.vue'
 import Announcement from './components/Admin/announcement.vue'
@@ -87,57 +86,7 @@ const router = new Router({
           },
         }
       ]
-    }, {
-      path: '/admin',
-      component: Admin,
-      meta: {
-        requiresAuth: true
-      },
-      children: [
-        {
-          path: '/Events',
-          component: Events,
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/Gallery',
-          component: Gallery,
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/Announcement',
-          component: Announcement,
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/Accounts',
-          component: Account,
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/Msu',
-          component: Msu,
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/Profile',
-          component: Profile,
-          meta: {
-            requiresAuth: true
-          },
-        }
-      ]
-    },
+    }, 
     
   ]
 })

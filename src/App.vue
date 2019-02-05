@@ -1,5 +1,7 @@
+
 <template>
   <v-app>
+    
     <transition
       name="custom-classes-transition"
     >
@@ -25,7 +27,8 @@
       this.$store.dispatch("getAnnounce")
       this.$store.dispatch("getInfo")
       this.$store.dispatch("getAccount")
-      // console.log(this.$store.getters.listofEvents)
     }
   }
+
+  
 </script>
